@@ -55,13 +55,5 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "files.associations": {
-    "led.h": "c",
-    "stm32f1xx.h": "c",
-    "stm32f1xx_hal_def.h": "c",
-    "exti.h": "c",
-    "usart.h": "c",
-    "delay.h": "c"
-  }
+  "C_Cpp_Runner.msvcSecureNoWarnings": false
 }
