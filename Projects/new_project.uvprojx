@@ -418,6 +418,11 @@
               <FileType>1</FileType>
               <FilePath>..\3_Drivers\1_BSP\led\led.c</FilePath>
             </File>
+            <File>
+              <FileName>exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\1_BSP\exti\exti.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
