@@ -5,6 +5,7 @@
 #include "exti/exti.h"
 
 
+extern uint8_t Rx_flag;
 //init : HAL, SYS_CLK, delay, usart_0
 void system_init()
 {
@@ -23,17 +24,24 @@ int main(void)
     led1_init(); // LED1  PE5
     key0_init(); // exti4 PE4 KEY0
     key1_init(); // exti3 PE3 KEY1
-
+    //uart_init(115200);
+	
+		uint32_t count = 0;
 	
     while(1)
     {
-		printf("hello world\n");
+			printf("program count = %d\n", count);
+			count++;
+        if(Rx_flag){
+            LED0_TOGGLE();
+            Rx_flag = 0;
+        }
         delay_ms(500);
     }
 }
 
 
-//重载HAL库的中断回调函数
+//重载HAL库的EXTI中断回调函数
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if(GPIO_Pin == KEY0_INT_GPIO_PIN)
@@ -48,3 +56,4 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         LED1_TOGGLE();
     }
 }
+
