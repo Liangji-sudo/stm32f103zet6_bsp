@@ -4,6 +4,7 @@
 #include "led/led.h"
 #include "exti/exti.h"
 #include "iwdg/iwdg.h"
+#include "wwdg/wwdg.h"
 
 
 extern uint8_t USART1_Rx_flag;
@@ -20,7 +21,8 @@ void system_init()
     led1_init(); // LED1  PE5
     key0_init(); // exti4 PE4 KEY0
     key1_init(); // exti3 PE3 KEY1
-    iwdg_init(IWDG_PRESCALER_64,625);
+    iwdg_init(IWDG_PRESCALER_64,625); //64分频，上限值为625
+    wwdg_init(0X7F, 0X5F, WWDG_PRESCALER_8);//8分频，重载值0x75, 上限值0x50,下限值0x3f
 }
 
 int main(void)
@@ -62,5 +64,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         printf("test2");
         LED1_TOGGLE();
     }
+}
+
+
+//窗口看门狗倒计时到下限的提前唤醒中断的回调函数
+void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
+{
+	HAL_WWDG_Refresh(hwwdg);
+	LED1_TOGGLE();
+	//printf("Refresh WWDG\n");
 }
 

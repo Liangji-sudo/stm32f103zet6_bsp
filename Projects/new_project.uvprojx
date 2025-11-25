@@ -428,6 +428,11 @@
               <FileType>1</FileType>
               <FilePath>..\3_Drivers\1_BSP\iwdg\iwdg.c</FilePath>
             </File>
+            <File>
+              <FileName>wwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\1_BSP\wwdg\wwdg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -502,6 +507,11 @@
               <FileName>stm32f1xx_hal_iwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\3_Drivers\3_HAL\Src\stm32f1xx_hal_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_wwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\3_HAL\Src\stm32f1xx_hal_wwdg.c</FilePath>
             </File>
           </Files>
         </Group>
