@@ -433,6 +433,11 @@
               <FileType>1</FileType>
               <FilePath>..\3_Drivers\1_BSP\wwdg\wwdg.c</FilePath>
             </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\1_BSP\tim\tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -512,6 +517,16 @@
               <FileName>stm32f1xx_hal_wwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\3_Drivers\3_HAL\Src\stm32f1xx_hal_wwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\3_HAL\Src\stm32f1xx_hal_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_tim_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\3_Drivers\3_HAL\Src\stm32f1xx_hal_tim_ex.c</FilePath>
             </File>
           </Files>
         </Group>
