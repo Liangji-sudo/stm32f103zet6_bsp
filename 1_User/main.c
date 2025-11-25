@@ -3,6 +3,7 @@
 #include "usart/usart.h"
 #include "led/led.h"
 #include "exti/exti.h"
+#include "iwdg/iwdg.h"
 
 
 extern uint8_t USART1_Rx_flag;
@@ -19,6 +20,7 @@ void system_init()
     led1_init(); // LED1  PE5
     key0_init(); // exti4 PE4 KEY0
     key1_init(); // exti3 PE3 KEY1
+    iwdg_init(IWDG_PRESCALER_64,625);
 }
 
 int main(void)
@@ -39,7 +41,8 @@ int main(void)
             LED1_TOGGLE();
             UART4_Rx_flag = 0;
         }
-        delay_ms(50);
+        
+        delay_ms(100);
     }
 }
 
@@ -51,6 +54,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         printf("test");
         LED0_TOGGLE();
+        iwdg_feed();
     }
 
     if(GPIO_Pin == KEY1_INT_GPIO_PIN)
