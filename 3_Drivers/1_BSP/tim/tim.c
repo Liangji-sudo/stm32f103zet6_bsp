@@ -280,18 +280,16 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 
 
-//liangji_init_TIM3_PWM(72-1, 20000-1, 2500);//72M/72 = 1Mhz   ARR = 500; PWM = 2000hz; ARR = 20000; PWM = 50hz 
-//TIM COMMON-2 - PWM Project
-#ifdef TIM_COMMON_2_PWM_OUTPUT
 
-#define GTIM_TIMX_PWM_CHY_GPIO_REMAP() do{__HAL_RCC_AFIO_CLK_ENABLE();\
-__HAL_AFIO_REMAP_TIM3_PARTIAL();\
-}while(0)
+//TIM COMMON-2 - PWM Project
+// TIM3 CH2 PA7 REMAP to PB5
+//TIM3_init_PWM(72-1, 20000-1, 2500);//72M/72 = 1Mhz   ARR = 500; PWM = 2000hz; ARR = 20000; PWM = 50hz 
+#ifdef TIM_COMMON_2_PWM_OUTPUT
 
 TIM_HandleTypeDef init_TIM3;
 TIM_OC_InitTypeDef init_TIM3_OC;
 GPIO_InitTypeDef init_gpio7;
-void liangji_init_TIM3_PWM(uint32_t psc, uint32_t period, uint32_t pulse)
+void TIM3_init_PWM(uint32_t psc, uint32_t period, uint32_t pulse)
 {
 	//enable clk
 	__HAL_RCC_TIM3_CLK_ENABLE();
@@ -300,7 +298,7 @@ void liangji_init_TIM3_PWM(uint32_t psc, uint32_t period, uint32_t pulse)
 	HAL_NVIC_SetPriority(TIM3_IRQn,2,3);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
 	
-	//io mux, PA7->TIM3_CH2, REMAP
+	//io mux, PA7->TIM3_CH2, REMAP to PB5
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	init_gpio7.Pin = GPIO_PIN_5;
 	init_gpio7.Mode = GPIO_MODE_AF_PP;
@@ -339,7 +337,8 @@ void liangji_init_TIM3_PWM(uint32_t psc, uint32_t period, uint32_t pulse)
 
 }
 
-void liangji_pwm_led(uint32_t max)
+//max为PWM的led输出的最亮的比较值， 不停的变换比较值，实现LED呼吸灯, 需要放到while循环里面更新
+void TIM3_set_led_max_val(uint32_t max)
 {
 	static uint8_t dir = 1;
 	static uint16_t ledrpwmval = 0;

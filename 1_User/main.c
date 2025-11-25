@@ -11,7 +11,8 @@
 //#define WDG_DBG
 #define UART_DBG
 //#define BASE_TIM_DBG
-#define TIM3_BASE_DBG
+//#define TIM3_BASE_DBG
+#define TIM3_PWM_DBG
 
 
 #ifdef UART_DBG
@@ -35,7 +36,9 @@ void system_init()
     uart4_init(115200);
 
     //LED0(PB5) LED1(PE5)
+    #ifndef TIM3_PWM_DBG
     led0_init(); // LED0  PB5
+    #endif
     led1_init(); // LED1  PE5
 
     //GPIO + EXTI (KEY0 PE4, KEY1 PE3)
@@ -56,6 +59,11 @@ void system_init()
     TIM3_init_BASE(7200-1, 5000-1); //set psc 7200, arr auto reload = 5000 = 500ms
     #endif
 
+    //TIM3 PWM remap to PB5, so disable LED0
+    #ifdef TIM3_PWM_DBG
+    TIM3_init_PWM(72-1, 20000-1, 15000);//72M/72 = 1Mhz   ARR = 500; PWM = 2000hz; ARR = 20000; PWM = 50hz 
+    #endif
+
 }
 
 int main(void)
@@ -66,7 +74,7 @@ int main(void)
 	
     while(1)
     {
-		printf("program count = %d\n", count);
+		//printf("program count = %d\n", count);
 		count++;
 
         #ifdef UART_DBG
@@ -82,6 +90,10 @@ int main(void)
         
         #ifdef TIM3_BASE_DBG
         LED0_TOGGLE();
+        #endif
+
+        #ifdef TIM3_PWM_DBG
+        TIM3_set_led_max_val(15000);
         #endif
 
         delay_ms(100);
