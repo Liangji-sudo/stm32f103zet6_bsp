@@ -3,8 +3,10 @@
 
 #include "stm32f1xx.h"
 
+//#define TIM_BASE_UPDATE_INT
+#define TIM_COMMON_1_BASE_UPDATE_INT
 //#define TIM_COMMON_4_PULSE_COUNT
-#define TIM_BASE_UPDATE_INT
+
 
 
 
@@ -37,7 +39,7 @@ void liangji_pwm_led(uint32_t max);
 #endif
 
 #ifdef TIM_COMMON_1_BASE_UPDATE_INT
-void liangji_init_TIM3(uint32_t psc, uint32_t period);
+void TIM3_init_BASE(uint32_t psc, uint32_t period);
 #endif
 
 

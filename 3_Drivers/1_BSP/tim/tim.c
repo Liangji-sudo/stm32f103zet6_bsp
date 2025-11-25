@@ -390,12 +390,18 @@ void liangji_pwm_led(uint32_t max)
 
 
 
-//TIM COMMON-1 - INT Project
+// TIM COMMON-1 - INT Project
+//TIM3
 
 #ifdef TIM_COMMON_1_BASE_UPDATE_INT
 
 #define liangji_TIM3_IRQHandler TIM3_IRQHandler
-void liangji_init_TIM3(uint32_t psc, uint32_t period)
+
+//传递更新事件中断信号
+uint8_t TIM3_BASE_Update_Int_flag = 0;
+TIM_HandleTypeDef init_TIM3;
+
+void TIM3_init_BASE(uint32_t psc, uint32_t period)
 {
 		//enable clk
 	__HAL_RCC_TIM3_CLK_ENABLE();
@@ -420,12 +426,14 @@ void liangji_init_TIM3(uint32_t psc, uint32_t period)
 	
 }
 
+//重载NVIC的中断处理函数，但是我们不使用HAL的通用的中断处理函数，我们自己靠寄存器实现，读取更新事件中断，清中断
 void liangji_TIM3_IRQHandler(void)
 {
 	//HAL_TIM_IRQHandler(&init_TIM3);
 	if(__HAL_TIM_GET_FLAG(&init_TIM3, TIM_FLAG_UPDATE))
 	{
 		//LED1_TOGGLE();
+		TIM3_BASE_Update_Int_flag = 1-TIM3_BASE_Update_Int_flag;
 		__HAL_TIM_CLEAR_FLAG(&init_TIM3, TIM_FLAG_UPDATE);
 	}
 }

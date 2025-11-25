@@ -10,12 +10,17 @@
 
 //#define WDG_DBG
 #define UART_DBG
-#define BASE_TIM_DBG
+//#define BASE_TIM_DBG
+#define TIM3_BASE_DBG
 
 
 #ifdef UART_DBG
 extern uint8_t USART1_Rx_flag;
 extern uint8_t UART4_Rx_flag;
+#endif
+
+#ifdef TIM3_BASE_DBG
+extern uint8_t TIM3_BASE_Update_Int_flag;
 #endif
 
 //init : HAL, SYS_CLK, delay, usart_0
@@ -47,6 +52,10 @@ void system_init()
     TIM6_init(7200-1, 5000-1); //set psc 7200, arr auto reload = 5000 = 500ms
     #endif
 
+    #ifdef TIM3_BASE_DBG
+    TIM3_init_BASE(7200-1, 5000-1); //set psc 7200, arr auto reload = 5000 = 500ms
+    #endif
+
 }
 
 int main(void)
@@ -71,6 +80,10 @@ int main(void)
         }
         #endif
         
+        #ifdef TIM3_BASE_DBG
+        LED0_TOGGLE();
+        #endif
+
         delay_ms(100);
     }
 }
