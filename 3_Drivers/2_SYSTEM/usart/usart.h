@@ -63,21 +63,38 @@ extern uint16_t g_usart_rx_sta;                 /* 接收状态标记 */
 extern uint8_t g_rx_buffer[RXBUFFERSIZE];       /* HAL库USART接收Buffer */
 
 
-void usart_init(uint32_t bound);                /* 串口初始化函数 */
+void usart_init(uint32_t baudrate);                /* 串口初始化函数 */
 
 
-//UART4 Tx PC10, Rx PC11
 
-#define UART_TX_GPIO_PORT GPIOC
-#define UART_RX_GPIO_PORT GPIOC
 
-#define UART_TX_GPIO_PIN GPIO_PIN_10
-#define UART_RX_GPIO_PIN GPIO_PIN_11
 
-#define BSP_UART4_IRQHandler UART4_IRQHandler
 
-void uart_init(uint32_t baud);
 
+//UART4 Tx PC10, Rx PC1
+#define UART4_TX_GPIO_PORT                  GPIOC
+#define UART4_TX_GPIO_PIN                   GPIO_PIN_10
+#define UART4_TX_GPIO_CLK_ENABLE()          do{ __HAL_RCC_GPIOC_CLK_ENABLE(); }while(0)   /* PA口时钟使能 */
+
+#define UART4_RX_GPIO_PORT                  GPIOC
+#define UART4_RX_GPIO_PIN                   GPIO_PIN_11
+#define UART4_RX_GPIO_CLK_ENABLE()          do{ __HAL_RCC_GPIOC_CLK_ENABLE(); }while(0)   /* PA口时钟使能 */
+
+#define UART4_UX                            UART4
+#define UART4_UX_IRQn                       UART4_IRQn
+
+#define UART4_UX_IRQHandler                 UART4_IRQHandler
+#define UART4_UX_CLK_ENABLE()               do{ __HAL_RCC_UART4_CLK_ENABLE(); }while(0)  /* USART1 时钟使能 */
+
+
+extern UART_HandleTypeDef g_uart4_handle;       /* HAL UART句柄 */
+
+extern uint8_t  g_uart4_rx_buf[USART_REC_LEN];  /* 接收缓冲,最大USART_REC_LEN个字节.末字节为换行符 */
+extern uint16_t g_uart4_rx_sta;                 /* 接收状态标记 */
+extern uint8_t g_uart4_rx_buffer[RXBUFFERSIZE];       /* HAL库USART接收Buffer */
+
+
+void uart4_init(uint32_t baudrate);                /* 串口初始化函数 */
 
 
 

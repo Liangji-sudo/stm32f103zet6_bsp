@@ -105,6 +105,8 @@ uint8_t g_rx_buffer[RXBUFFERSIZE];  /* HAL库使用的串口接收缓冲 */
 
 UART_HandleTypeDef g_uart1_handle;  /* UART句柄 */
 
+uint8_t USART1_Rx_flag = 0;
+
 /**
  * @brief       串口X初始化函数
  * @param       baudrate: 波特率, 根据自己需要设置波特率值
@@ -188,68 +190,62 @@ void USART_UX_IRQHandler(void)
 
 
 /*
-UART4
-TX PC10
-RX PC11
+UART4 
+Tx PC10
+Rx PC11
 */
+uint8_t g_uart4_rx_buffer[RXBUFFERSIZE];  /* HAL库使用的串口接收缓冲 */
 
-#define RX_Buffer_Len 128
-uint8_t RX_Buffer[RX_Buffer_Len] = {0};
-uint8_t TX_array[4] = {0x63, 0x6F, 0x70, 0x79};
-uint8_t Rx_flag = 0;
+UART_HandleTypeDef g_uart4_handle;  /* UART句柄 */
 
-UART_HandleTypeDef uart_struct_init;
-void uart_init(uint32_t baud)
+uint8_t UART4_Rx_flag = 0;
+
+void uart4_init(uint32_t baudrate)
 {
 
-    //时钟
+    GPIO_InitTypeDef gpio_init_struct;
+
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_AFIO_CLK_ENABLE();
     __HAL_RCC_UART4_CLK_ENABLE();
 
-    //io配置 + io复用
-    //Tx
-    GPIO_InitTypeDef gpio_Init;
-    gpio_Init.Pin = UART_TX_GPIO_PIN;
-    gpio_Init.Mode = GPIO_MODE_AF_PP;
-    gpio_Init.Pull = GPIO_PULLUP;
-    gpio_Init.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(UART_TX_GPIO_PORT, &gpio_Init);
+    gpio_init_struct.Pin = UART4_TX_GPIO_PIN;               /* 串口发送引脚号 */
+    gpio_init_struct.Mode = GPIO_MODE_AF_PP;                /* 复用推挽输出 */
+    gpio_init_struct.Pull = GPIO_PULLUP;                    /* 上拉 */
+    gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;          /* IO速度设置为高速 */
+    HAL_GPIO_Init(UART4_TX_GPIO_PORT, &gpio_init_struct);
+            
+    gpio_init_struct.Pin = UART4_RX_GPIO_PIN;               /* 串口RX脚 模式设置 */
+    gpio_init_struct.Mode = GPIO_MODE_AF_INPUT;    
+    HAL_GPIO_Init(UART4_RX_GPIO_PORT, &gpio_init_struct);   /* 串口RX脚 必须设置成输入模式 */
 
-    //Rx
-    gpio_Init.Pin = UART_RX_GPIO_PIN;
-    gpio_Init.Mode = GPIO_MODE_AF_INPUT; 
-    HAL_GPIO_Init(UART_TX_GPIO_PORT, &gpio_Init);
 
-    //uart配置
+    /*UART 初始化设置*/
+    g_uart4_handle.Instance = UART4_UX;                                       /* USART_UX */
+    g_uart4_handle.Init.BaudRate = baudrate;                                  /* 波特率 */
+    g_uart4_handle.Init.WordLength = UART_WORDLENGTH_8B;                      /* 字长为8位数据格式 */
+    g_uart4_handle.Init.StopBits = UART_STOPBITS_1;                           /* 一个停止位 */
+    g_uart4_handle.Init.Parity = UART_PARITY_NONE;                            /* 无奇偶校验位 */
+    g_uart4_handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;                      /* 无硬件流控 */
+    g_uart4_handle.Init.Mode = UART_MODE_TX_RX;                               /* 收发模式 */
+    HAL_UART_Init(&g_uart4_handle);                                           /* HAL_UART_Init()会使能UART1 */
 
-    uart_struct_init.Instance = UART4;
-    uart_struct_init.Init.BaudRate = baud;
-    uart_struct_init.Init.WordLength = UART_WORDLENGTH_8B;                      /* 字长为8位数据格式 */
-    uart_struct_init.Init.StopBits = UART_STOPBITS_1;                           /* 一个停止位 */
-    uart_struct_init.Init.Parity = UART_PARITY_NONE;                            /* 无奇偶校验位 */
-    uart_struct_init.Init.HwFlowCtl = UART_HWCONTROL_NONE;  
-    uart_struct_init.Init.Mode = UART_MODE_TX_RX;
-    HAL_UART_Init(&uart_struct_init);
+    HAL_NVIC_EnableIRQ(UART4_UX_IRQn);                      /* 使能USART1中断通道 */
+    HAL_NVIC_SetPriority(UART4_UX_IRQn, 3, 3);              /* 组2，最低优先级:抢占优先级3，子优先级3 */
 
-    //NVIC响应
-    HAL_NVIC_SetPriority(UART4_IRQn, 3, 3);
-    HAL_NVIC_EnableIRQ(UART4_IRQn);
 
-    //USART1 接收中断
-    HAL_UART_Receive_IT(&uart_struct_init, RX_Buffer, RX_Buffer_Len);
+    /* 该函数会开启接收中断：标志位UART_IT_RXNE，并且设置接收缓冲以及接收缓冲接收最大数据量 */
+    HAL_UART_Receive_IT(&g_uart4_handle, (uint8_t *)g_uart4_rx_buffer, RXBUFFERSIZE); 
 }
 
-
-//重载接收中断处理函数
-void BSP_USART1_IRQHandler()
+void UART4_UX_IRQHandler(void)
 {
-    //习惯性调用HAL库来实现中断处理函数, 里面调用回调函数来接受，关中断
-    HAL_UART_IRQHandler(&uart_struct_init);
+    HAL_UART_IRQHandler(&g_uart4_handle);   /* 调用HAL库中断处理公用函数 */
 
-    //开中断
-    HAL_UART_Receive_IT(&uart_struct_init, RX_Buffer, RX_Buffer_Len);
+    HAL_UART_Receive_IT(&g_uart4_handle, (uint8_t *)g_uart4_rx_buffer, RXBUFFERSIZE);
 }
+
+
 
 
 
@@ -266,7 +262,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     // 回调函数来实现自己的接受协议
     if (huart->Instance == USART_UX)                    /* 如果是串口1 */
     {
-				Rx_flag = 1;
+		USART1_Rx_flag = 1;
         if ((g_usart_rx_sta & 0x8000) == 0)             /* 接收未完成 */
         {
             if (g_usart_rx_sta & 0x4000)                /* 接收到了0x0d（即回车键） */
@@ -300,13 +296,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         HAL_UART_Receive_IT(&g_uart1_handle, (uint8_t *)g_rx_buffer, RXBUFFERSIZE);
     }
 
-    /*
-    if (huart->Instance == UART4)
+
+        if (huart->Instance == UART4)                    /* 如果是串口1 */
     {
-        if(RX_Buffer[0] == 0x0a){
-            Rx_flag = 1;
-        }
-        HAL_UART_Receive_IT(&uart_struct_init, RX_Buffer, RX_Buffer_Len);
+        //可以在这里实现自己的通信协议
+		UART4_Rx_flag = 1;
     }
-    */
+
 }
+

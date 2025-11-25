@@ -5,7 +5,8 @@
 #include "exti/exti.h"
 
 
-extern uint8_t Rx_flag;
+extern uint8_t USART1_Rx_flag;
+extern uint8_t UART4_Rx_flag;
 //init : HAL, SYS_CLK, delay, usart_0
 void system_init()
 {
@@ -13,30 +14,32 @@ void system_init()
     sys_stm32_clock_init(RCC_PLL_MUL9);         /* 设置时钟,72M */
     delay_init(72);                             /* 初始化延时函数 */
 	usart_init(115200);
+    uart4_init(115200);
+    led0_init(); // LED0  PB5
+    led1_init(); // LED1  PE5
+    key0_init(); // exti4 PE4 KEY0
+    key1_init(); // exti3 PE3 KEY1
 }
 
 int main(void)
 {
 	system_init();
 	
-
-	led0_init(); // LED0  PB5
-    led1_init(); // LED1  PE5
-    key0_init(); // exti4 PE4 KEY0
-    key1_init(); // exti3 PE3 KEY1
-    //uart_init(115200);
-	
-		uint32_t count = 0;
+	uint32_t count = 0;
 	
     while(1)
     {
-			printf("program count = %d\n", count);
-			count++;
-        if(Rx_flag){
+		printf("program count = %d\n", count);
+		count++;
+        if(USART1_Rx_flag){
             LED0_TOGGLE();
-            Rx_flag = 0;
+            USART1_Rx_flag = 0;
         }
-        delay_ms(500);
+        if(UART4_Rx_flag){
+            LED1_TOGGLE();
+            UART4_Rx_flag = 0;
+        }
+        delay_ms(50);
     }
 }
 
